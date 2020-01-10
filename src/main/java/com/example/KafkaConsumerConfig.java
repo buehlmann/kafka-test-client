@@ -17,23 +17,26 @@ import java.util.Map;
 @Configuration
 public class KafkaConsumerConfig {
 
-    @Value("${bootstrapServer:kafka-kafka-bootstrap:9093}")
+    @Value("${bootstrap.server:kafka-kafka-bootstrap:9093}")
     private String bootstrapServer;
 
-    @Value("${trustStoreLocation}")
+    @Value("${trust.store.location}")
     private String trustStoreLocation;
 
-    @Value("${trustStorePassword}")
+    @Value("${trust.store.password}")
     private String trustStorePassword;
 
-    @Value("${securityProtocol:SASL_SSL}")
+    @Value("${security.protocol:SASL_SSL}")
     private String securityProtocol;
 
-    @Value("${saslMechanism:SCRAM-SHA-512}")
+    @Value("${sasl.mechanism:SCRAM-SHA-512}")
     private String saslMechanism;
 
-    @Value("${consumerGroupId:my-group}")
+    @Value("${consumer.group.id:my-group}")
     private String consumerGroupId;
+
+    @Value("${ssl.endpoint.identification.algorithm:none}")
+    private String sslEndpointIdentificationAlgorithm;
 
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
@@ -47,6 +50,8 @@ public class KafkaConsumerConfig {
         props.put("security.protocol", securityProtocol);
         props.put("ssl.truststore.location", trustStoreLocation);
         props.put("ssl.truststore.password", trustStorePassword);
+        props.put("ssl.endpoint.identification.algorithm", sslEndpointIdentificationAlgorithm);
+
         // mutual tls:
         //props.put("security.protocol", "SSL");
         //props.put("ssl.key.password", keyStorePassword);
