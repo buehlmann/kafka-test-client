@@ -25,10 +25,19 @@ public class KafkaProducerConfig {
     @Value("${trust.store.password}")
     private String trustStorePassword;
 
-    @Value("${security.protocol:SASL_SSL}")
+    @Value("${keystore.location}")
+    private String keystoreLocation;
+
+    @Value("${keystore.password}")
+    private String keystorePassword;
+
+    @Value("${keystore.key}")
+    private String keystoreKey;
+
+    @Value("${security.protocol:SSL}")
     private String securityProtocol;
 
-    @Value("${sasl.mechanism:SCRAM-SHA-512}")
+    @Value("${sasl.mechanism}")
     private String saslMechanism;
 
     @Value("${ssl.endpoint.identification.algorithm:none}")
@@ -45,6 +54,11 @@ public class KafkaProducerConfig {
         props.put("security.protocol", securityProtocol);
         props.put("ssl.truststore.location", trustStoreLocation);
         props.put("ssl.truststore.password", trustStorePassword);
+
+        props.put("ssl.key.password", keystorePassword);
+        props.put("ssl.keystore.password", keystorePassword);
+        props.put("ssl.keystore.location", keystoreLocation);
+
         props.put("ssl.endpoint.identification.algorithm", sslEndpointIdentificationAlgorithm);
         return new DefaultKafkaProducerFactory<>(props);
     }

@@ -20,16 +20,25 @@ public class KafkaConsumerConfig {
     @Value("${bootstrap.server:kafka-kafka-bootstrap:9093}")
     private String bootstrapServer;
 
-    @Value("${trust.store.location}")
-    private String trustStoreLocation;
+    @Value("${truststore.location}")
+    private String truststoreLocation;
 
-    @Value("${trust.store.password}")
-    private String trustStorePassword;
+    @Value("${truststore.password}")
+    private String truststorePassword;
 
-    @Value("${security.protocol:SASL_SSL}")
+    @Value("${keystore.location}")
+    private String keystoreLocation;
+
+    @Value("${keystore.password}")
+    private String keystorePassword;
+
+    @Value("${keystore.key}")
+    private String keystoreKey;
+
+    @Value("${security.protocol:SSL}")
     private String securityProtocol;
 
-    @Value("${sasl.mechanism:SCRAM-SHA-512}")
+    @Value("${sasl.mechanism}")
     private String saslMechanism;
 
     @Value("${consumer.group.id:my-group}")
@@ -42,21 +51,20 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumerGroupId");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put("sasl.mechanism", saslMechanism);
         // Configure SASL_SSL if SSL encryption is enabled, otherwise configure SASL_PLAINTEXT
         props.put("security.protocol", securityProtocol);
-        props.put("ssl.truststore.location", trustStoreLocation);
-        props.put("ssl.truststore.password", trustStorePassword);
-        props.put("ssl.endpoint.identification.algorithm", sslEndpointIdentificationAlgorithm);
+        props.put("ssl.truststore.location", truststoreLocation);
+        props.put("ssl.truststore.password", truststorePassword);
 
-        // mutual tls:
-        //props.put("security.protocol", "SSL");
-        //props.put("ssl.key.password", keyStorePassword);
-        //props.put("ssl.keystore.password", keyStorePassword);
-        //props.put("ssl.keystore.location", keyStoreLocation);
+        props.put("ssl.key.password", keystorePassword);
+        props.put("ssl.keystore.password", keystorePassword);
+        props.put("ssl.keystore.location", keystoreLocation);
+
+        props.put("ssl.endpoint.identification.algorithm", sslEndpointIdentificationAlgorithm);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
