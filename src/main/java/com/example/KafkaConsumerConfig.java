@@ -38,7 +38,7 @@ public class KafkaConsumerConfig {
     @Value("${security.protocol:SSL}")
     private String securityProtocol;
 
-    @Value("${sasl.mechanism}")
+    @Value("${sasl.mechanism:}")
     private String saslMechanism;
 
     @Value("${consumer.group.id:my-group}")

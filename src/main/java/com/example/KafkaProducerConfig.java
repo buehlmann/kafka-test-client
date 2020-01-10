@@ -19,11 +19,11 @@ public class KafkaProducerConfig {
     @Value("${bootstrap.server:kafka-kafka-bootstrap:9093}")
     private String bootstrapServer;
 
-    @Value("${trust.store.location}")
-    private String trustStoreLocation;
+    @Value("${truststore.location}")
+    private String truststoreLocation;
 
-    @Value("${trust.store.password}")
-    private String trustStorePassword;
+    @Value("${truststore.password}")
+    private String truststorePassword;
 
     @Value("${keystore.location}")
     private String keystoreLocation;
@@ -37,7 +37,7 @@ public class KafkaProducerConfig {
     @Value("${security.protocol:SSL}")
     private String securityProtocol;
 
-    @Value("${sasl.mechanism}")
+    @Value("${sasl.mechanism:}")
     private String saslMechanism;
 
     @Value("${ssl.endpoint.identification.algorithm:none}")
@@ -52,8 +52,8 @@ public class KafkaProducerConfig {
         props.put("sasl.mechanism", saslMechanism);
         // Configure SASL_SSL if SSL encryption is enabled, otherwise configure SASL_PLAINTEXT
         props.put("security.protocol", securityProtocol);
-        props.put("ssl.truststore.location", trustStoreLocation);
-        props.put("ssl.truststore.password", trustStorePassword);
+        props.put("ssl.truststore.location", truststoreLocation);
+        props.put("ssl.truststore.password", truststorePassword);
 
         props.put("ssl.key.password", keystorePassword);
         props.put("ssl.keystore.password", keystorePassword);
