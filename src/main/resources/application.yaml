@@ -1,0 +1,21 @@
+# see: https://docs.confluent.io/current/kafka/authentication_ssl.html#clients
+# see: https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html
+spring:
+  kafka:
+    bootstrap-servers: kafka-kafka-bootstrap:9093
+    client-id: demo-app
+    consumer:
+      group-id: my-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-serializer: org.apache.kafka.common.serialization.StringDeserializer
+    ssl:
+      key-store-location: file:/var/run/secrets/java.io/keystores/keystore.jks
+      key-store-password: mypass
+      key-password: jhezQ5mC2rsT
+      trust-store-location: file:/var/run/secrets/java.io/keystores/truststore.jks
+      trust-store-password: mypass
+    properties:
+      security.protocol: SSL
