@@ -9,8 +9,8 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-serializer: org.apache.kafka.common.serialization.Serializer
+      value-serializer: org.apache.kafka.common.serialization.Serializer
     ssl:
       key-store-location: file:/var/run/secrets/java.io/keystores/keystore.jks
       key-store-password: mypass
