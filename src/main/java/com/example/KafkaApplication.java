@@ -22,12 +22,11 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 public class KafkaApplication {
 
     public static void main(String[] args) throws Exception {
-
         ConfigurableApplicationContext context = SpringApplication.run(KafkaApplication.class, args);
 
         MessageProducer producer = context.getBean(MessageProducer.class);
         MessageListener listener = context.getBean(MessageListener.class);
-        producer.sendMessage("Hello, World!");
+        producer.sendMessage("Hello, World from Spring Boot!!");
         listener.latch.await(10, TimeUnit.SECONDS);
 
         context.close();
@@ -48,7 +47,7 @@ public class KafkaApplication {
         @Autowired
         private KafkaTemplate<String, String> kafkaTemplate;
 
-        @Value(value = "${message.topic.name:hello}")
+        @Value(value = "${message.topic.name:prefix-topic1}")
         private String topicName;
 
         public void sendMessage(String message) {
@@ -70,7 +69,7 @@ public class KafkaApplication {
 
         private CountDownLatch latch = new CountDownLatch(3);
 
-        @KafkaListener(topics = "${message.topic.name:hello}", containerFactory = "headersKafkaListenerContainerFactory")
+        @KafkaListener(topics = "${message.topic.name:prefix-topic1}", containerFactory = "headersKafkaListenerContainerFactory")
         public void listenWithHeaders(@Payload String message, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
             System.out.println("Received Messasge: " + message + " from partition: " + partition);
             latch.countDown();
