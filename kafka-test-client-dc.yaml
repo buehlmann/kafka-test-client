@@ -1,0 +1,149 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: null
+  generation: 1
+  labels:
+    app: kafka-test-client
+  name: kafka-test-client
+  selfLink: /apis/apps.openshift.io/v1/namespaces/springboot-kafka/deploymentconfigs/kafka-test-client
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: kafka-test-client
+    deploymentconfig: kafka-test-client
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: kafka-test-client
+        deploymentconfig: kafka-test-client
+    spec:
+      containers:
+      - env:
+        - name: JAVA_OPTS
+          value: -Djavax.net.debug=none
+        image: 172.30.1.1:5000/springboot-kafka/kafka-test-client@sha256:af28433f61dbaf5cf2fb98bb76af93fd0b8cdb63e50ef2440d486a6dafc8a8bd
+        imagePullPolicy: Always
+        name: kafka-test-client
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        - containerPort: 8778
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/run/secrets/java.io/keystores
+          name: keystore-volume
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - /bin/bash
+        - -xvc
+        - |
+          echo "starting truststore initialization"
+          keytool -v -import -noprompt -keystore $truststore_jks -file $ca_bundle -storepass $storepass -alias $(basename $ca_bundle)
+          echo "finished truststore initialization"
+        env:
+        - name: ca_bundle
+          value: /var/run/secrets/java.io/certs/ca.crt
+        - name: truststore_jks
+          value: /var/run/secrets/java.io/keystores/truststore.jks
+        - name: storepass
+          value: mypass
+        image: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift
+        imagePullPolicy: IfNotPresent
+        name: truststore-init
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/run/secrets/java.io/keystores
+          name: keystore-volume
+        - mountPath: /var/run/secrets/java.io/certs
+          name: ca-cert-volume
+      - command:
+        - /bin/bash
+        - -xvc
+        - |
+          echo "starting keystore initialization"
+          openssl pkcs12 -export -inkey $srckey -in $srccertificate -out /var/run/secrets/java.io/keystores/keystore.p12 -password pass:$storepass
+          keytool -v -noprompt -importkeystore -srcstoretype PKCS12 -deststorepass $storepass -destkeystore $destkeystore -srckeystore /var/run/secrets/java.io/keystores/keystore.p12 -srcstorepass $storepass
+          echo "finished keystore initialization"
+        env:
+        - name: srckey
+          value: /var/run/secrets/java.io/certs/user.key
+        - name: srccertificate
+          value: /var/run/secrets/java.io/certs/user.crt
+        - name: destkeystore
+          value: /var/run/secrets/java.io/keystores/keystore.jks
+        - name: storepass
+          value: mypass
+        image: registry.access.redhat.com/redhat-sso-7/sso73-openshift
+        imagePullPolicy: IfNotPresent
+        name: keystore-init
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/run/secrets/java.io/keystores
+          name: keystore-volume
+        - mountPath: /var/run/secrets/java.io/certs
+          name: user-cert-volume
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: keystore-volume
+      - name: ca-cert-volume
+        secret:
+          defaultMode: 420
+          secretName: kafka-cluster-ca-cert
+      - name: user-cert-volume
+        secret:
+          defaultMode: 420
+          secretName: bill
+      - configMap:
+          defaultMode: 420
+          name: kafka-kafka-config
+        name: test-volume
+  test: false
+  triggers:
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - kafka-test-client
+      from:
+        kind: ImageStreamTag
+        name: kafka-test-client:latest
+        namespace: springboot-kafka
+    type: ImageChange
+  - type: ConfigChange
+status:
+  availableReplicas: 0
+  latestVersion: 0
+  observedGeneration: 0
+  replicas: 0
+  unavailableReplicas: 0
+  updatedReplicas: 0
